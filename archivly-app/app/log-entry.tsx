@@ -7,13 +7,10 @@ import { Button } from '../components/ui/Button';
 import { OutcomePill } from '../components/ui/OutcomePill';
 import { TextField } from '../components/ui/TextField';
 import { createLog } from '../lib/logs';
+import { toDateString } from '../lib/stats';
 import type { Outcome } from '../types/database';
 
 const NOTE_LIMIT = 280;
-
-function toDateString(date: Date): string {
-  return date.toISOString().slice(0, 10);
-}
 
 export default function LogEntry() {
   const [title, setTitle] = useState('');

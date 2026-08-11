@@ -21,6 +21,21 @@ export async function fetchRecentLogs(limit = 20): Promise<LogRow[]> {
   return data ?? [];
 }
 
+// Weekly/monthly windows are small (at most ~31 rows), so it's cheap to pull
+// the raw logs and aggregate client-side. Yearly stats use the get_period_stats
+// RPC instead -- see lib/stats.ts.
+export async function fetchLogsInRange(startDate: string, endDate: string): Promise<LogRow[]> {
+  const { data, error } = await supabase
+    .from('logs')
+    .select('*')
+    .gte('date', startDate)
+    .lte('date', endDate)
+    .order('date', { ascending: true });
+
+  if (error) throw error;
+  return data ?? [];
+}
+
 export async function createLog(input: NewLogInput): Promise<LogRow> {
   const {
     data: { user },

@@ -1,5 +1,29 @@
 export type Outcome = 'win' | 'loss' | 'neutral';
 
+export type CategoryCountRow = {
+  category: string;
+  count: number;
+};
+
+export type HeatmapDayRow = {
+  date: string;
+  count: number;
+};
+
+export type PeriodStatsRow = {
+  total: number;
+  wins: number;
+  losses: number;
+  neutrals: number;
+  categories: CategoryCountRow[];
+  heatmap: HeatmapDayRow[];
+};
+
+export type StreaksRow = {
+  longest: number;
+  current: number;
+};
+
 export type LogRow = {
   id: string;
   user_id: string;
@@ -43,7 +67,16 @@ export type Database = {
       };
     };
     Views: Record<string, never>;
-    Functions: Record<string, never>;
+    Functions: {
+      get_period_stats: {
+        Args: { p_start: string; p_end: string };
+        Returns: PeriodStatsRow;
+      };
+      get_streaks: {
+        Args: Record<string, never>;
+        Returns: StreaksRow;
+      };
+    };
     Enums: Record<string, never>;
     CompositeTypes: Record<string, never>;
   };

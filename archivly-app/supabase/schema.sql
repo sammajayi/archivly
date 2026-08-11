@@ -70,3 +70,85 @@ create policy "logs_delete_own"
 -- Indexes for the stats dashboard (date-range scans, streaks, per-category rollups)
 create index if not exists logs_user_id_date_idx on public.logs (user_id, date desc);
 create index if not exists logs_user_id_category_idx on public.logs (user_id, category);
+
+-- ---------------------------------------------------------------------------
+-- stats dashboard RPCs
+-- ---------------------------------------------------------------------------
+-- Pre-aggregated period stats (totals, outcome breakdown, top categories,
+-- per-day activity for the heatmap) computed in Postgres so the client never
+-- has to pull a full year of rows just to add them up. Runs with the
+-- caller's own privileges, so RLS on public.logs still scopes every row to
+-- auth.uid() -- the explicit user_id filter below is just an index hint.
+create or replace function public.get_period_stats(p_start date, p_end date)
+returns jsonb
+language sql
+stable
+as $$
+  select jsonb_build_object(
+    'total', count(*),
+    'wins', count(*) filter (where outcome = 'win'),
+    'losses', count(*) filter (where outcome = 'loss'),
+    'neutrals', count(*) filter (where outcome = 'neutral'),
+    'categories', coalesce(
+      (select jsonb_agg(jsonb_build_object('category', c.category, 'count', c.cnt))
+       from (
+         select category, count(*) as cnt
+         from public.logs
+         where user_id = auth.uid()
+           and date between p_start and p_end
+           and category is not null
+         group by category
+         order by cnt desc
+         limit 3
+       ) c),
+      '[]'::jsonb
+    ),
+    'heatmap', coalesce(
+      (select jsonb_agg(jsonb_build_object('date', d.date, 'count', d.cnt))
+       from (
+         select date, count(*) as cnt
+         from public.logs
+         where user_id = auth.uid()
+           and date between p_start and p_end
+         group by date
+       ) d),
+      '[]'::jsonb
+    )
+  )
+  from public.logs
+  where user_id = auth.uid()
+    and date between p_start and p_end;
+$$;
+
+-- Longest streak is all-time and current streak counts back from today (or
+-- yesterday, so a streak isn't shown as broken before the day is over) --
+-- both need every logged date, not just the selected period, so this is
+-- always computed in Postgres rather than pulled to the client.
+create or replace function public.get_streaks()
+returns jsonb
+language sql
+stable
+as $$
+  with dates as (
+    select distinct date
+    from public.logs
+    where user_id = auth.uid()
+    order by date
+  ),
+  grouped as (
+    select date, date - (row_number() over (order by date))::int as grp
+    from dates
+  ),
+  streaks as (
+    select min(date) as start_date, max(date) as end_date, count(*) as len
+    from grouped
+    group by grp
+  )
+  select jsonb_build_object(
+    'longest', coalesce((select max(len) from streaks), 0),
+    'current', coalesce(
+      (select len from streaks where end_date >= current_date - 1 order by end_date desc limit 1),
+      0
+    )
+  );
+$$;
