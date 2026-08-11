@@ -2,6 +2,10 @@
 module.exports = {
   content: ['./app/**/*.{js,jsx,ts,tsx}', './components/**/*.{js,jsx,ts,tsx}'],
   presets: [require('nativewind/preset')],
+  // Archivly ships one calm light theme (PRD 6.2) -- no dark mode. 'class'
+  // (vs. the default 'media') keeps NativeWind from auto-syncing to the
+  // system color scheme on web, which otherwise throws on load.
+  darkMode: 'class',
   theme: {
     extend: {
       colors: {
