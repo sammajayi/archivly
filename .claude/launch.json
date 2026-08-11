@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "archivly-app",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["--prefix", "archivly-app", "run", "web"],
+      "port": 8081
+    }
+  ]
+}
