@@ -20,7 +20,7 @@ export function Pricing() {
         <div className="flex flex-col gap-4 rounded-card border border-primary bg-surface p-6">
           <h3 className="text-lg font-semibold text-text-primary">Archivly Pro</h3>
           <p className="text-3xl font-bold text-text-primary">
-            $[price]<span className="text-base font-normal text-text-secondary">/mo</span>
+            $1<span className="text-base font-normal text-text-secondary">/mo</span>
           </p>
           <ul className="flex flex-col gap-2 text-sm text-text-secondary">
             {PRO_FEATURES.map((f) => (
@@ -30,7 +30,6 @@ export function Pricing() {
           <PlayStoreButton className="mt-2" />
         </div>
       </div>
-      <p className="mt-4 text-center text-xs text-text-secondary">Pro pricing not finalized -- Phase 2.</p>
     </section>
   );
 }
