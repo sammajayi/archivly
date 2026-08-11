@@ -2,11 +2,14 @@ import { useState } from 'react';
 import { Text, View, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
 import { Link } from 'expo-router';
 import { useAuth } from '../../context/AuthContext';
+import { useGoogleAuth } from '../../lib/useGoogleAuth';
 import { Button } from '../../components/ui/Button';
+import { GoogleIcon } from '../../components/ui/GoogleIcon';
 import { TextField } from '../../components/ui/TextField';
 
 export default function SignUp() {
   const { signUpWithPassword } = useAuth();
+  const { request, promptAsync } = useGoogleAuth();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -67,6 +70,14 @@ export default function SignUp() {
             {error ? <Text className="text-sm text-loss">{error}</Text> : null}
 
             <Button label="Sign up" onPress={handleSignUp} loading={loading} />
+
+            <Button
+              label="Continue with Google"
+              variant="secondary"
+              icon={<GoogleIcon />}
+              disabled={!request}
+              onPress={() => promptAsync()}
+            />
           </View>
         )}
 

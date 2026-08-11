@@ -4,6 +4,7 @@ import { Link } from 'expo-router';
 import { useAuth } from '../../context/AuthContext';
 import { useGoogleAuth } from '../../lib/useGoogleAuth';
 import { Button } from '../../components/ui/Button';
+import { GoogleIcon } from '../../components/ui/GoogleIcon';
 import { TextField } from '../../components/ui/TextField';
 
 export default function SignIn() {
@@ -57,6 +58,7 @@ export default function SignIn() {
           <Button
             label="Continue with Google"
             variant="secondary"
+            icon={<GoogleIcon />}
             disabled={!request}
             onPress={() => promptAsync()}
           />
