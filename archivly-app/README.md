@@ -9,7 +9,7 @@ logging, auth, and the foundation for the stats dashboard.
 - **Mobile:** React Native (Expo SDK 57) with Expo Router
 - **Styling:** NativeWind (Tailwind for React Native)
 - **Auth + DB:** Supabase (email/password + Google OAuth, Row Level Security)
-- **AI Summaries:** Anthropic Claude API (planned, not yet wired up)
+- **AI Summaries:** Groq API, called from a Supabase Edge Function (supabase/functions/generate-summary)
 - **Language:** TypeScript (strict mode)
 
 ## Setup

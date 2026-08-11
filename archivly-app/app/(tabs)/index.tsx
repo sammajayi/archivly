@@ -4,6 +4,7 @@ import { useFocusEffect } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Card } from '../../components/ui/Card';
 import { ActivityHeatmap } from '../../components/stats/ActivityHeatmap';
+import { AiSummary } from '../../components/stats/AiSummary';
 import { OutcomeBreakdown } from '../../components/stats/OutcomeBreakdown';
 import { PeriodNav } from '../../components/stats/PeriodNav';
 import { PeriodTabs } from '../../components/stats/PeriodTabs';
@@ -116,6 +117,18 @@ export default function Home() {
               <Text className="text-sm font-medium text-text-secondary">Top categories</Text>
               <TopCategories categories={stats.topCategories} />
             </View>
+
+            {period !== 'year' ? (
+              <View className="gap-2">
+                <Text className="text-sm font-medium text-text-secondary">AI recap</Text>
+                <AiSummary
+                  period={period}
+                  range={range}
+                  disabled={period === 'month' && offset === 0}
+                  disabledReason={period === 'month' && offset === 0 ? 'Unlocks on the 1st of next month, once this month is complete.' : undefined}
+                />
+              </View>
+            ) : null}
           </>
         )}
       </ScrollView>
