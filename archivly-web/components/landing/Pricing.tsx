@@ -6,7 +6,7 @@ const PRO_FEATURES = ['Everything in Free', 'Unlimited AI summaries', 'Priority 
 export function Pricing() {
   return (
     <section className="mx-auto max-w-4xl px-6 py-16">
-      <h2 className="text-center text-2xl font-bold text-text-primary sm:text-3xl">Simple pricing</h2>
+      <h2 className="text-center text-2xl font-bold text-text-primary sm:text-3xl">Pricing</h2>
       <div className="mt-12 grid gap-6 sm:grid-cols-2">
         <div className="flex flex-col gap-4 rounded-card border border-border bg-surface p-6">
           <h3 className="text-lg font-semibold text-text-primary">Free</h3>
