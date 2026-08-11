@@ -1,17 +1,20 @@
 {
   "expo": {
-    "name": "archivly-app",
+    "name": "Archivly",
     "slug": "archivly-app",
+    "scheme": "archivly",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "xyz.archivly.app"
     },
     "android": {
+      "package": "xyz.archivly.app",
       "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
+        "backgroundColor": "#FAFAFA",
         "foregroundImage": "./assets/android-icon-foreground.png",
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
@@ -19,7 +22,18 @@
       "predictiveBackGestureEnabled": false
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/favicon.png",
+      "bundler": "metro"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-splash-screen",
+      "expo-font",
+      "expo-web-browser",
+      "expo-secure-store"
+    ],
+    "experiments": {
+      "typedRoutes": true
     }
   }
 }
