@@ -7,9 +7,9 @@ import { ActivityHeatmap } from '../../components/stats/ActivityHeatmap';
 import { AiSummary } from '../../components/stats/AiSummary';
 import { OutcomeBreakdown } from '../../components/stats/OutcomeBreakdown';
 import { PeriodNav } from '../../components/stats/PeriodNav';
-import { PeriodTabs } from '../../components/stats/PeriodTabs';
+import { PeriodSelect } from '../../components/stats/PeriodSelect';
 import { StatTile } from '../../components/stats/StatTile';
-import { StreakStats } from '../../components/stats/StreakStats';
+import { StreakBadge } from '../../components/stats/StreakBadge';
 import { TopCategories } from '../../components/stats/TopCategories';
 import { colors } from '../../lib/theme';
 import {
@@ -79,12 +79,15 @@ export default function Home() {
           />
         }
       >
-        <View>
-          <Text className="text-2xl font-bold text-text-primary">Archivly</Text>
-          <Text className="text-base text-text-secondary">Your activity, at a glance</Text>
+        <View className="flex-row items-start justify-between">
+          <View>
+            <Text className="text-2xl font-bold text-text-primary">Archivly</Text>
+            <Text className="text-base text-text-secondary">Your activity, at a glance</Text>
+          </View>
+          <StreakBadge current={streaks.current} />
         </View>
 
-        <PeriodTabs value={period} onChange={changePeriod} />
+        <PeriodSelect value={period} onChange={changePeriod} />
         <PeriodNav label={range.label} onPrev={() => setOffset((o) => o - 1)} onNext={() => setOffset((o) => o + 1)} nextDisabled={offset >= 0} />
 
         {loading ? (
@@ -103,8 +106,6 @@ export default function Home() {
             </Card>
 
             <OutcomeBreakdown stats={stats} />
-
-            <StreakStats streaks={streaks} />
 
             <View className="gap-2">
               <Text className="text-sm font-medium text-text-secondary">Activity</Text>
