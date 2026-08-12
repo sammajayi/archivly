@@ -6,7 +6,7 @@ logging, auth, and the foundation for the stats dashboard.
 
 ## Stack
 
-- **Mobile:** React Native (Expo SDK 57) with Expo Router
+- **Mobile:** React Native (Expo SDK 54) with Expo Router
 - **Styling:** NativeWind (Tailwind for React Native)
 - **Auth + DB:** Supabase (email/password + Google OAuth, Row Level Security)
 - **AI Summaries:** Groq API, called from a Supabase Edge Function (supabase/functions/generate-summary)
