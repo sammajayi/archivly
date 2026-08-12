@@ -46,7 +46,7 @@ export default function PrivacyPage() {
 
         <section>
           <h2 className="text-lg font-semibold">Contact</h2>
-          <p className="mt-2 text-text-secondary">[Placeholder] privacy@archivly.app</p>
+          <p className="mt-2 text-text-secondary">sam@archivly.xyz</p>
         </section>
       </div>
     </main>

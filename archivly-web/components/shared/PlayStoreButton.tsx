@@ -1,5 +1,5 @@
 const PLAY_STORE_URL =
-  process.env.NEXT_PUBLIC_PLAY_STORE_URL ?? 'https://play.google.com/store/apps/details?id=com.archivly.app';
+  process.env.NEXT_PUBLIC_PLAY_STORE_URL ?? 'https://play.google.com/store/apps/details?id=xyz.archivly.app';
 
 export function PlayStoreButton({ className = '' }: { className?: string }) {
   return (

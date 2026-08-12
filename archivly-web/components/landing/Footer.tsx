@@ -9,7 +9,7 @@ export function Footer() {
           <Link href="/privacy" className="hover:text-text-primary">
             Privacy
           </Link>
-          <a href="mailto:hello@archivly.app" className="hover:text-text-primary">
+          <a href="mailto:sam@archivly.xyz" className="hover:text-text-primary">
             Contact
           </a>
         </nav>

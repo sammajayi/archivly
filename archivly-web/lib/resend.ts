@@ -1,7 +1,7 @@
 import { Resend } from 'resend';
 
 const resendApiKey = process.env.RESEND_API_KEY;
-const fromEmail = process.env.RESEND_FROM_EMAIL ?? 'Archivly <hello@archivly.app>';
+const fromEmail = process.env.RESEND_FROM_EMAIL ?? 'Archivly <sam@archivly.xyz>';
 
 export async function sendWaitlistConfirmation(email: string): Promise<void> {
   if (!resendApiKey) {
