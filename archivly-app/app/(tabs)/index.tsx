@@ -1,5 +1,5 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { ActivityIndicator, RefreshControl, ScrollView, Text, View } from 'react-native';
+import { useCallback, useMemo, useRef, useState } from 'react';
+import { ActivityIndicator, Modal, Pressable, RefreshControl, ScrollView, Text, View } from 'react-native';
 import { useFocusEffect } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Card } from '../../components/ui/Card';
@@ -9,15 +9,18 @@ import { PeriodNav } from '../../components/stats/PeriodNav';
 import { PeriodSelect } from '../../components/stats/PeriodSelect';
 import { StatTile } from '../../components/stats/StatTile';
 import { StreakBadge } from '../../components/stats/StreakBadge';
+import { StreakCard } from '../../components/stats/StreakCard';
 import { TopCategories } from '../../components/stats/TopCategories';
 import { colors } from '../../lib/theme';
 import {
   EMPTY_STATS,
   fetchPeriodStats,
   fetchStreaks,
+  fetchStreakWeek,
   getPeriodRange,
   type Period,
   type PeriodStats,
+  type StreakDay,
   type Streaks,
 } from '../../lib/stats';
 
@@ -28,8 +31,16 @@ export default function Home() {
   const [offset, setOffset] = useState(0);
   const [stats, setStats] = useState<PeriodStats>(EMPTY_STATS);
   const [streaks, setStreaks] = useState<Streaks>(EMPTY_STREAKS);
+  const [streakDays, setStreakDays] = useState<StreakDay[]>([]);
+  const [streakCardVisible, setStreakCardVisible] = useState(false);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+
+  // Tracks whether today already had a log as of the last load, so a fresh
+  // load can tell "extended today" (false -> true) apart from "already
+  // extended, just re-rendering" (true -> true) or the very first load.
+  const hasLoadedOnce = useRef(false);
+  const wasTodayActive = useRef(false);
 
   const range = useMemo(() => getPeriodRange(period, offset), [period, offset]);
 
@@ -50,6 +61,21 @@ export default function Home() {
       setStreaks(await fetchStreaks());
     } catch (err) {
       console.error('Failed to load streaks', err);
+    }
+    try {
+      const days = await fetchStreakWeek();
+      setStreakDays(days);
+
+      const todayActive = days.find((d) => d.isToday)?.active ?? false;
+      if (hasLoadedOnce.current && !wasTodayActive.current && todayActive) {
+        // Today just went from "not logged" to "logged" -- the streak was
+        // extended (or started) by whatever brought us back to this screen.
+        setStreakCardVisible(true);
+      }
+      wasTodayActive.current = todayActive;
+      hasLoadedOnce.current = true;
+    } catch (err) {
+      console.error('Failed to load streak week', err);
     }
     setLoading(false);
     setRefreshing(false);
@@ -83,7 +109,7 @@ export default function Home() {
             <Text className="text-2xl font-bold text-text-primary">Archivly</Text>
             <Text className="text-base text-text-secondary">Your activity, at a glance</Text>
           </View>
-          <StreakBadge current={streaks.current} />
+          <StreakBadge current={streaks.current} onPress={() => setStreakCardVisible(true)} />
         </View>
 
         <PeriodSelect value={period} onChange={changePeriod} />
@@ -125,6 +151,14 @@ export default function Home() {
           </>
         )}
       </ScrollView>
+
+      <Modal visible={streakCardVisible} transparent animationType="fade" onRequestClose={() => setStreakCardVisible(false)}>
+        <Pressable className="flex-1 items-center justify-center bg-black/40 px-6" onPress={() => setStreakCardVisible(false)}>
+          <Pressable className="w-full" onPress={(e) => e.stopPropagation()}>
+            <StreakCard current={streaks.current} longest={streaks.longest} days={streakDays} />
+          </Pressable>
+        </Pressable>
+      </Modal>
     </SafeAreaView>
   );
 }

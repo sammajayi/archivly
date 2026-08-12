@@ -1,5 +1,5 @@
 import { Pressable, View } from 'react-native';
-import { Tabs, useRouter } from 'expo-router';
+import { Tabs, useRouter, usePathname } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors } from '../../lib/theme';
@@ -10,6 +10,8 @@ const FAB_SIZE = 56;
 export default function TabsLayout() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const pathname = usePathname();
+  const showFab = pathname !== '/profile';
 
   return (
     <View style={{ flex: 1 }}>
@@ -44,28 +46,30 @@ export default function TabsLayout() {
         />
       </Tabs>
 
-      <Pressable
-        onPress={() => router.push('/log-entry')}
-        hitSlop={8}
-        style={{
-          position: 'absolute',
-          right: 20,
-          bottom: TAB_BAR_HEIGHT + insets.bottom + 16,
-          width: FAB_SIZE,
-          height: FAB_SIZE,
-          borderRadius: FAB_SIZE / 2,
-          backgroundColor: colors.primary,
-          alignItems: 'center',
-          justifyContent: 'center',
-          shadowColor: '#000',
-          shadowOffset: { width: 0, height: 4 },
-          shadowOpacity: 0.2,
-          shadowRadius: 8,
-          elevation: 6,
-        }}
-      >
-        <Ionicons name="add" color="#FFFFFF" size={28} />
-      </Pressable>
+      {showFab ? (
+        <Pressable
+          onPress={() => router.push('/log-entry')}
+          hitSlop={8}
+          style={{
+            position: 'absolute',
+            right: 20,
+            bottom: TAB_BAR_HEIGHT + insets.bottom + 16,
+            width: FAB_SIZE,
+            height: FAB_SIZE,
+            borderRadius: FAB_SIZE / 2,
+            backgroundColor: colors.primary,
+            alignItems: 'center',
+            justifyContent: 'center',
+            shadowColor: '#000',
+            shadowOffset: { width: 0, height: 4 },
+            shadowOpacity: 0.2,
+            shadowRadius: 8,
+            elevation: 6,
+          }}
+        >
+          <Ionicons name="add" color="#FFFFFF" size={28} />
+        </Pressable>
+      ) : null}
     </View>
   );
 }

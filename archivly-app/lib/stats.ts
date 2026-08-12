@@ -167,6 +167,39 @@ export async function fetchYearlyStats(range: PeriodRange): Promise<PeriodStats>
   return buildStats(data.total, data.wins, data.losses, data.neutrals, data.categories ?? [], data.heatmap ?? []);
 }
 
+export interface StreakDay {
+  date: string; // YYYY-MM-DD
+  label: string; // single-letter weekday label, 'S' 'M' 'T' 'W' 'T' 'F' 'S'
+  active: boolean; // has at least one log
+  isToday: boolean;
+  isFuture: boolean; // later this week, hasn't happened yet -- distinct from "missed"
+}
+
+const STREAK_WEEK_LABELS = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+
+// Sunday-Saturday, independent of the Monday-based week used by the period
+// selector above -- the streak card always shows the calendar week.
+function getStreakWeekDates(today: Date): { date: string; label: string; isToday: boolean; isFuture: boolean }[] {
+  const sunday = new Date(today);
+  sunday.setDate(today.getDate() - today.getDay());
+  const todayStr = toDateString(today);
+
+  return STREAK_WEEK_LABELS.map((label, i) => {
+    const d = new Date(sunday);
+    d.setDate(sunday.getDate() + i);
+    const date = toDateString(d);
+    return { date, label, isToday: date === todayStr, isFuture: date > todayStr };
+  });
+}
+
+/** This week (Sun-Sat), with which days have a log -- powers the streak card. */
+export async function fetchStreakWeek(today: Date = new Date()): Promise<StreakDay[]> {
+  const days = getStreakWeekDates(today);
+  const logs = await fetchLogsInRange(days[0].date, days[6].date);
+  const activeDates = new Set(logs.map((log) => log.date));
+  return days.map((day) => ({ ...day, active: activeDates.has(day.date) }));
+}
+
 /** All-time, independent of the selected period -- always computed in Postgres. */
 export async function fetchStreaks(): Promise<Streaks> {
   const { data, error } = await supabase.rpc('get_streaks');
