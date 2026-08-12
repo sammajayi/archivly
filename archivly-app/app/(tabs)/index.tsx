@@ -3,7 +3,6 @@ import { ActivityIndicator, RefreshControl, ScrollView, Text, View } from 'react
 import { useFocusEffect } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Card } from '../../components/ui/Card';
-import { ActivityHeatmap } from '../../components/stats/ActivityHeatmap';
 import { AiSummary } from '../../components/stats/AiSummary';
 import { OutcomeBreakdown } from '../../components/stats/OutcomeBreakdown';
 import { PeriodNav } from '../../components/stats/PeriodNav';
@@ -106,13 +105,6 @@ export default function Home() {
             </Card>
 
             <OutcomeBreakdown stats={stats} />
-
-            <View className="gap-2">
-              <Text className="text-sm font-medium text-text-secondary">Activity</Text>
-              <Card>
-                <ActivityHeatmap start={range.start} end={range.end} data={stats.heatmap} />
-              </Card>
-            </View>
 
             <View className="gap-2">
               <Text className="text-sm font-medium text-text-secondary">Top categories</Text>

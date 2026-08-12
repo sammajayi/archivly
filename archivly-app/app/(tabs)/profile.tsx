@@ -1,6 +1,7 @@
 import { useCallback, useState } from 'react';
-import { Alert, Platform, Pressable, Switch, Text, View } from 'react-native';
+import { Alert, Linking, Platform, Pressable, Switch, Text, View } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAuth } from '../../context/AuthContext';
@@ -72,7 +73,7 @@ export default function Profile() {
   return (
     <SafeAreaView className="flex-1 bg-background" edges={['top']}>
       <View className="gap-4 px-6 pt-4">
-        <Text className="text-2xl font-bold text-text-primary">Profile</Text>
+        <Text className="text-2xl font-bold text-text-primary">Me</Text>
 
         <Card>
           <Text className="text-sm text-text-secondary">Signed in as</Text>
@@ -108,6 +109,16 @@ export default function Profile() {
               }}
             />
           ) : null}
+        </Card>
+
+        <Card>
+          <Pressable
+            onPress={() => Linking.openURL('mailto:sam@archivly.xyz?subject=Archivly%20support')}
+            className="flex-row items-center justify-between"
+          >
+            <Text className="text-base text-text-primary">Contact support</Text>
+            <Ionicons name="chevron-forward" size={18} color={colors.border} />
+          </Pressable>
         </Card>
 
         <Button label="Log out" variant="secondary" onPress={signOut} />
