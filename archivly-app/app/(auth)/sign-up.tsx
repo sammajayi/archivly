@@ -11,6 +11,7 @@ export default function SignUp() {
   const { signUpWithPassword } = useAuth();
   const { request, promptAsync } = useGoogleAuth();
 
+  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -24,7 +25,7 @@ export default function SignUp() {
       return;
     }
     setLoading(true);
-    const { error: signUpError } = await signUpWithPassword(email.trim(), password);
+    const { error: signUpError } = await signUpWithPassword(email.trim(), password, name.trim());
     setLoading(false);
     if (signUpError) {
       setError(signUpError);
@@ -50,6 +51,13 @@ export default function SignUp() {
           </Text>
         ) : (
           <View className="gap-4">
+            <TextField
+              label="Name"
+              autoCapitalize="words"
+              autoComplete="name"
+              value={name}
+              onChangeText={setName}
+            />
             <TextField
               label="Email"
               autoCapitalize="none"

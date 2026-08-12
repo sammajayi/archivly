@@ -1,0 +1,9 @@
+# Minimal Supabase CLI config so `supabase functions deploy` knows how to
+# publish the welcome-email function. Any function invoked from a DB trigger
+# (via pg_net) must disable JWT verification -- Postgres has no caller JWT, so
+# we authenticate the request with our own shared secret header instead, which
+# the function verifies against the WELCOME_SECRET env var.
+project_id = "archivly"
+
+[functions.send-welcome-email]
+verify_jwt = false
