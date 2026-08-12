@@ -38,6 +38,41 @@ it in a browser (`npm run web`) -- useful for quick local iteration without
 a simulator installed, though a couple of native-only bits render
 differently there.
 
+## Builds & signing (EAS)
+
+Uses EAS Build (continuous native generation) for dev/preview/release. The
+native `ios/` and `android/` folders are gitignored and generated on the fly.
+
+```bash
+eas login                                   # once, per machine
+eas build --platform android --profile development --local  # no emulator? drop --local
+eas build --platform android --profile production           # release AAB pre-Play-Store
+```
+
+Signed with a keystore that EAS generates and holds on the first build (or
+one you upload via `eas credentials`). See "Google OAuth on Android" below
+for why the keystore fingerprint matters.
+
+Play Store: enable **Play App Signing** and add the Play signing cert SHA-1
+to the same OAuth client, keeping the debug + EAS fingerprints alongside.
+
+Prefer a dev build over Expo Go for anything auth-related:
+
+- `eas build --platform android --profile development`
+- install it, then `npx expo start` and press `a`.
+
+### Google OAuth on Android
+
+`EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID` must match the SHA-1 of the cert the
+running APK/AAB is signed with, or Google rejects the sign-in. Add these to
+the **Android** OAuth client in console.cloud.google.com (package name
+`xyz.archivly.app`):
+
+- debug keystore SHA-1 for local dev builds:
+  `keytool -list -v -keystore ~/.android/debug.keystore -alias androiddebugkey -storepass android`
+- `eas credentials` keystore SHA-1 for EAS dev/preview/release builds
+- Play App Signing SHA-1 when distributing via Google Play
+
 ## Project structure
 
 ```
