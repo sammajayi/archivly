@@ -32,7 +32,15 @@
       "expo-web-browser",
       "expo-secure-store",
       "expo-notifications",
-      "expo-dev-client"
+      "expo-dev-client",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Archivly uses your photos to attach proof of a win to a log entry.",
+          "cameraPermission": "Archivly uses your camera to attach proof of a win to a log entry."
+        }
+      ],
+      "expo-document-picker"
     ],
     "experiments": {
       "typedRoutes": true

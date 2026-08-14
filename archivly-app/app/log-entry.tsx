@@ -3,10 +3,13 @@ import { KeyboardAvoidingView, Platform, Pressable, ScrollView, Text, View } fro
 import { router } from 'expo-router';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { AttachmentField } from '../components/log-entry/AttachmentField';
 import { Button } from '../components/ui/Button';
 import { OutcomePill } from '../components/ui/OutcomePill';
 import { TextField } from '../components/ui/TextField';
+import { deleteAttachment, uploadAttachment, type PickedAttachment } from '../lib/attachments';
 import { createLog } from '../lib/logs';
+import { supabase } from '../lib/supabase';
 import { toDateString } from '../lib/stats';
 import type { Outcome } from '../types/database';
 
@@ -19,6 +22,7 @@ export default function LogEntry() {
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [note, setNote] = useState('');
   const [category, setCategory] = useState('');
+  const [attachment, setAttachment] = useState<PickedAttachment | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
 
@@ -34,16 +38,37 @@ export default function LogEntry() {
     }
 
     setSaving(true);
+    let uploadedPath: string | null = null;
     try {
+      let attachmentUrl: string | null = null;
+      let attachmentType: PickedAttachment['type'] | null = null;
+
+      if (attachment) {
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
+        if (!user) throw new Error('Not signed in.');
+
+        const uploaded = await uploadAttachment(user.id, attachment);
+        uploadedPath = uploaded.path;
+        attachmentUrl = uploaded.path;
+        attachmentType = uploaded.type;
+      }
+
       await createLog({
         title: title.trim(),
         outcome,
         date: toDateString(date),
         note,
         category,
+        attachmentUrl,
+        attachmentType,
       });
       router.back();
     } catch (err) {
+      // Save failed after the file made it to storage -- don't leave an
+      // orphaned object behind since nothing will ever reference it.
+      if (uploadedPath) await deleteAttachment(uploadedPath).catch(() => {});
       setError(err instanceof Error ? err.message : 'Could not save this entry.');
     } finally {
       setSaving(false);
@@ -129,6 +154,8 @@ export default function LogEntry() {
               style={{ minHeight: 80, textAlignVertical: 'top' }}
             />
           </View>
+
+          <AttachmentField attachment={attachment} onChange={setAttachment} onError={setError} />
 
           {error ? <Text className="text-sm text-loss">{error}</Text> : null}
 

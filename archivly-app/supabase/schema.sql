@@ -45,8 +45,18 @@ create table if not exists public.logs (
   date date not null default current_date,
   note text check (char_length(note) <= 280),
   category text,
+  -- Storage object path within the log-attachments bucket, not a public URL
+  -- (the bucket is private) -- resolve to a viewable link with a signed URL.
+  attachment_url text,
+  attachment_type text check (attachment_type is null or attachment_type in ('image', 'pdf')),
   created_at timestamptz not null default now()
 );
+
+alter table public.logs add column if not exists attachment_url text;
+alter table public.logs add column if not exists attachment_type text;
+alter table public.logs drop constraint if exists logs_attachment_type_check;
+alter table public.logs add constraint logs_attachment_type_check
+  check (attachment_type is null or attachment_type in ('image', 'pdf'));
 
 alter table public.logs enable row level security;
 
@@ -152,3 +162,45 @@ as $$
     )
   );
 $$;
+
+-- ---------------------------------------------------------------------------
+-- log-attachments storage bucket
+-- ---------------------------------------------------------------------------
+-- Private bucket -- objects are only reachable via signed URLs. Files are
+-- keyed as {auth.uid()}/{filename}, same "owner folder" convention as the
+-- table RLS above, so storage.foldername(name)[1] is the owning user's id.
+insert into storage.buckets (id, name, public)
+values ('log-attachments', 'log-attachments', false)
+on conflict (id) do nothing;
+
+create policy "log_attachments_select_own"
+  on storage.objects for select
+  using (
+    bucket_id = 'log-attachments'
+    and auth.uid()::text = (storage.foldername(name))[1]
+  );
+
+create policy "log_attachments_insert_own"
+  on storage.objects for insert
+  with check (
+    bucket_id = 'log-attachments'
+    and auth.uid()::text = (storage.foldername(name))[1]
+  );
+
+create policy "log_attachments_update_own"
+  on storage.objects for update
+  using (
+    bucket_id = 'log-attachments'
+    and auth.uid()::text = (storage.foldername(name))[1]
+  )
+  with check (
+    bucket_id = 'log-attachments'
+    and auth.uid()::text = (storage.foldername(name))[1]
+  );
+
+create policy "log_attachments_delete_own"
+  on storage.objects for delete
+  using (
+    bucket_id = 'log-attachments'
+    and auth.uid()::text = (storage.foldername(name))[1]
+  );

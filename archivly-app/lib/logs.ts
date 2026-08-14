@@ -1,5 +1,5 @@
 import { supabase } from './supabase';
-import type { LogRow, Outcome } from '../types/database';
+import type { AttachmentType, LogRow, Outcome } from '../types/database';
 
 export interface NewLogInput {
   title: string;
@@ -7,6 +7,8 @@ export interface NewLogInput {
   date: string; // YYYY-MM-DD
   note?: string | null;
   category?: string | null;
+  attachmentUrl?: string | null;
+  attachmentType?: AttachmentType | null;
 }
 
 export async function fetchRecentLogs(limit = 20): Promise<LogRow[]> {
@@ -51,6 +53,8 @@ export async function createLog(input: NewLogInput): Promise<LogRow> {
       date: input.date,
       note: input.note?.trim() ? input.note.trim() : null,
       category: input.category?.trim() ? input.category.trim() : null,
+      attachment_url: input.attachmentUrl ?? null,
+      attachment_type: input.attachmentType ?? null,
     })
     .select()
     .single();

@@ -1,5 +1,7 @@
 export type Outcome = 'win' | 'loss' | 'neutral';
 
+export type AttachmentType = 'image' | 'pdf';
+
 export type CategoryCountRow = {
   category: string;
   count: number;
@@ -32,6 +34,9 @@ export type LogRow = {
   date: string; // YYYY-MM-DD
   note: string | null;
   category: string | null;
+  // Storage object path in the log-attachments bucket, not a public URL.
+  attachment_url: string | null;
+  attachment_type: AttachmentType | null;
   created_at: string;
 };
 
