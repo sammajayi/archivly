@@ -59,7 +59,7 @@ function buildPrompt(body: SummaryRequestBody, logs: LogForSummary[]): string {
     .map((l) => `- ${l.date} [${l.outcome.toUpperCase()}]${l.category ? ` (${l.category})` : ''}: ${l.title}${l.note ? ` -- ${l.note}` : ''}`)
     .join('\n');
 
-  return `You are writing a short recap of someone's ${body.period} of logged activities for the Archivly app. Tone: direct, honest, motivational -- call out gaps and patterns, not just wins. 3-4 sentences, second person ("you"), plain narrative paragraph, no headers or bullet points.
+  return `You are writing a short recap of someone's ${body.period} of logged activities for the Archivly app. Tone: plain and direct, like a friend giving a quick factual rundown -- not motivational, no hype or coach-speak, no generic encouragement. State what was actually logged, by name (e.g. "you submitted the assignment and hit a new PR"). Only call out a gap or pattern (a stretch of losses, a category going quiet) if it's genuinely notable -- don't force one in. 1-3 sentences, second person ("you"), plain narrative paragraph, no headers or bullet points.
 
 Period: ${body.periodLabel}
 Totals: ${logs.length} activities logged -- ${wins} wins, ${losses} losses, ${neutrals} neutral.
@@ -142,7 +142,10 @@ Deno.serve(async (req) => {
     },
     body: JSON.stringify({
       model: GROQ_MODEL,
-      max_tokens: 400,
+      max_tokens: 200,
+      // Lower temperature keeps the recap literal (what was logged) instead
+      // of drifting into flowery, motivational phrasing.
+      temperature: 0.3,
       messages: [{ role: 'user', content: buildPrompt(body, logs) }],
     }),
   });
